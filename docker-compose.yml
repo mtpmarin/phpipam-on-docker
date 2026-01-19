@@ -1,0 +1,35 @@
+services:
+  mariadb:
+    image: mariadb:latest
+    container_name: phpipam-mariadb
+    hostname: phpipam-mariadb
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+    volumes:
+      - mariadb-data:/var/lib/mysql
+    ports:
+      - 3307:3306
+  phpipam:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: phpipam
+    hostname: phpipam
+    ports:
+        - 8001:80
+    environment:
+      - IPAM_DATABASE_HOST=mariadb
+      - IPAM_DATABASE_USER=${MYSQL_USER}
+      - IPAM_DATABASE_PASS=${MYSQL_PASSWORD}
+      - IPAM_DATABASE_NAME=${MYSQL_DATABASE}
+      - IPAM_DATABASE_PORT=3306
+      - allow_untested_php_versions=true
+    depends_on:
+      - mariadb
+    
+volumes:
+  mariadb-data:
+
